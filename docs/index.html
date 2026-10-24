@@ -885,14 +885,14 @@ function proposalHtml(c){
   var pr=(c.proposal||[]).slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:hm(a.start)-hm(b.start)});
   if(!pr.length)return '';
   var past=pr[pr.length-1].date<today();
-  return '<h4 style="margin:14px 0 2px;font-size:15px">Vorschlag für die Woche</h4><ul class="cprop">'+pr.map(function(b){var m=modOf(b.moduleId);
+  return '<h4 style="margin:14px 0 2px;font-size:15px">'+(c.type==='week'?'Vorschlag für die Woche':'Vorschlag für deinen Plan')+'</h4><ul class="cprop">'+pr.map(function(b){var m=modOf(b.moduleId);
       return '<li><b>'+esc(dayLabel(b.date))+' '+esc(b.start)+'</b><span>'+esc(m.short||m.name)+(b.note?' · '+esc(b.note):'')+'</span></li>'}).join('')+'</ul>'
     +(c.applied?'<p class="hint">Übernommen'+(c.appliedAt?' am '+fmtDate(c.appliedAt.slice(0,10)):'')+'. Du kannst jeden Block im Kalender weiter ändern.</p>'
       :past?'':'<div class="frow" style="margin-top:10px"><button class="btn small" data-coach="apply|'+esc(c.id)+'">Plan übernehmen</button><span class="hint" style="margin:0">ersetzt deine noch offenen Blöcke in diesen Tagen</span></div>');
 }
 function entryHtml(c,full){
   return '<div class="centry"><div class="ckind">'+esc((CK[c.type]||CK.morning).n)+' · '+esc(dayLabel(c.date))+'</div>'
-    +(c.title?'<h3 style="margin:4px 0 0">'+esc(c.title)+'</h3>':'')+mdLite(c.text)+(full&&c.type==='week'?proposalHtml(c):'')+'</div>';
+    +(c.title?'<h3 style="margin:4px 0 0">'+esc(c.title)+'</h3>':'')+mdLite(c.text)+(full&&c.proposal&&c.proposal.length?proposalHtml(c):'')+'</div>';
 }
 function checkinHtml(ci){
   if(!ci)return '';
