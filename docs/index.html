@@ -468,6 +468,74 @@ details.cday summary span{color:var(--muted);font-weight:400;font-size:13px}
 .cnote .ans{margin-top:6px;color:var(--fg)}
 .cnote small{color:var(--muted)}
 .cmini .ctext{max-height:9.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+/* ---------- Ruhigeres Layout (v2): weniger Rahmen, klare Hierarchie ---------- */
+body{padding-top:20px}
+h1{font-size:28px}
+h3{font-size:17px;font-weight:650}
+header.top{align-items:center}
+header.top>div:first-child{flex:1;min-width:0}
+.hdacct{order:1;width:40px;height:40px;border-radius:50%;border:0;background:var(--group);color:var(--fg);display:inline-flex;align-items:center;justify-content:center}
+.hd-sub:empty,.hd-sub:has(#timerchip:empty){display:none}
+.panel{padding:20px;border-radius:20px;box-shadow:0 0 0 1px var(--line2)}
+.panel>h3:first-child{margin-bottom:6px}
+.lnk{border:0;background:none;color:var(--accent);font-size:14px;font-weight:600;padding:8px 0;min-height:40px}
+/* Heute */
+.hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;background:var(--surface);border-radius:20px;padding:18px 20px;box-shadow:0 0 0 1px var(--line2)}
+.hero .hello{background:none;box-shadow:none;padding:0}
+.hero .hello b{font-size:22px}
+.stats{display:flex;gap:24px}
+.stats>div{display:flex;flex-direction:column;gap:2px}
+.stats span{font-size:12px;color:var(--muted);font-weight:500}
+.stats b{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stats small{font-size:13px;font-weight:500;color:var(--muted)}
+.titem{background:var(--surface);border:0;border-radius:12px;box-shadow:inset 3px 0 0 hsl(var(--h) 55% 52%),0 0 0 1px var(--line2);min-height:56px}
+.titem.lec{background:hsl(var(--h) var(--mod-bg-s) var(--study-bg-l))}
+.titem .tmain{color:var(--fg);padding:10px 14px 10px 16px}
+.titem .tt{color:var(--muted);font-weight:500}
+.titem .tn b{font-size:15px;display:flex;align-items:center;gap:8px}
+.titem .tn span{font-size:13px;color:var(--muted);opacity:1;white-space:normal;line-height:1.35;margin-top:1px}
+.titem .tq{border-left:1px solid var(--line2);font-weight:600}
+.titem.commute{background:var(--surface);box-shadow:inset 3px 0 0 var(--line),0 0 0 1px var(--line2)}
+.titem.commute .tn b{font-weight:500;font-size:14px}
+.cmini .centry{border:0;padding:0;margin-top:4px}
+.cmini .ckind{display:none}
+.cmini h3{font-size:17px}
+.cmini .ctext{max-height:6.2em}
+/* Woche */
+.blk{border:0;border-radius:8px;box-shadow:inset 3px 0 0 hsl(var(--h) 55% 50%);padding:5px 7px 5px 9px}
+.blk.study{border:0;background:hsl(var(--h) var(--mod-bg-s) calc(var(--study-bg-l) - 3%));box-shadow:inset 3px 0 0 hsl(var(--h) 55% 50%),inset 0 0 0 1px hsl(var(--h) 40% var(--mod-line-l))}
+.blk.study.done{opacity:.6}
+.blk b,.blk .t{flex-shrink:0}
+.blk .k{font-size:11px;line-height:1.3;opacity:.85;overflow:hidden;white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.blk.commute{background:var(--group);box-shadow:none;opacity:.7}
+.blk{padding:3px 6px 3px 9px;line-height:1.2}
+.titem .nowtag{flex:none}
+.titem.commute{min-height:48px}
+.titem.commute .tq{min-width:0;font-size:13px}
+.trfoot{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;margin-top:8px}
+.trfoot details[open]{flex-basis:100%}
+.trfoot summary{list-style:none;cursor:pointer;display:inline-block}
+.trfoot summary::-webkit-details-marker{display:none}
+.wtday{padding:10px 0;border-bottom:1px solid var(--line2)}
+.wtday:last-child{border:0}
+.wtday.past{opacity:.55}
+.wtd{font-size:13px;font-weight:650;color:var(--fg);margin-bottom:6px;display:flex;gap:8px;align-items:baseline}
+.wtd span{color:var(--muted);font-weight:500}
+.wtday.today .wtd{color:var(--accent)}
+.wt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;padding:7px 0 7px 12px;border-radius:0;box-shadow:inset 3px 0 0 hsl(var(--h) 55% 52%);margin:4px 0;color:var(--fg)}
+.wt .wtt{font-size:13px;color:var(--muted);min-width:40px;font-variant-numeric:tabular-nums;padding-top:1px}
+.wt .wtn{display:flex;flex-direction:column;min-width:0;flex:1}
+.wt .wtn b{font-size:14px;font-weight:600}
+.wt .wtn span{font-size:13px;color:var(--muted);line-height:1.35}
+.wt.done .wtn b{text-decoration:line-through;color:var(--muted)}
+.wtok{color:var(--ok)}.wtok svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:3}
+@media (max-width:720px){
+  h1{font-size:26px}
+  .hero{padding:16px}
+  .stats{gap:18px;width:100%;justify-content:space-between}
+  .stats b{font-size:18px}
+  .wkside{grid-template-columns:minmax(0,1fr)}
+}
 </style>
 </head>
 <body>
@@ -476,8 +544,9 @@ details.cday summary span{color:var(--muted);font-weight:400;font-size:13px}
   <header class="top">
     <div>
       <h1>Mein Plan</h1>
-      <div class="hd-sub"><span>Studium, Sport, Projekte · WS 2026/27</span><span id="timerchip"></span></div>
+      <div class="hd-sub"><span id="timerchip"></span></div>
     </div>
+    <button class="hdacct" data-acct="1" aria-label="Konto und Daten"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg></button>
     <nav class="tabs" role="tablist" id="tabs"></nav>
     <div class="overall" id="overall"></div>
   </header>
@@ -544,6 +613,7 @@ function xpInfo(){
 }
 function streak(){var days={};logsArr().forEach(function(l){days[l.date]=1});var t=today(),d=t,n=0;if(!days[d])d=addDays(d,-1);while(days[d]){n++;d=addDays(d,-1)}return {n:n,today:!!days[t]}}
 function lastLog(mid){var r=null;logsArr().forEach(function(l){if(l.moduleId===mid&&(!r||l.date>r))r=l.date});return r}
+function taskOf(b){if(b.task)return b.task;var m=S.modules[b.moduleId];var n=m&&nextStep(m);return n?n.t:''}
 function nextStep(m){var p=m.path||[];for(var i=0;i<p.length;i++)if(!p[i].done)return {i:i,t:p[i].t};return null}
 function mods(){return Object.keys(S.modules).map(function(id){var m=S.modules[id];m.id=id;return m}).filter(function(m){return !m.archived}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'')})}
 function modOf(id){return S.modules[id]||{name:'?',short:'?',hue:210}}
@@ -580,7 +650,7 @@ function findMaterial(assetId){var r=null;mods().forEach(function(m){(m.material
 /* ---------- Rendering ---------- */
 function render(){
   if(S.dragging||S.touching){S.pendingRender=true;return}
-  renderOverall();renderTimerChip();
+  renderOverall();renderTimerChip();$('overall').hidden=S.tab!=='modules';
   var tabs=[['today','Heute'],['coach','Coach'],['week','Woche'],['modules','Studium'],['projects','Projekte'],['tracker','Stunden']];
   $('tabs').innerHTML=tabs.map(function(t){return '<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+ICO[t[0]]+'<span>'+t[1]+'</span></button>'}).join('');
   renderToast();
@@ -633,7 +703,7 @@ function weekView(){
   o+='<div class="wkl"><div class="panel"><div class="weekbar"><div class="nav"><button class="rbtn" data-wk="-1" aria-label="Vorige Woche">'+ICO.prev+'</button>'
     +'<span class="lbl"><b>KW '+isoWeek(mon)+'</b><span>'+fmtShort(mon)+' – '+fmtDate(dates[6])+'</span></span><button class="rbtn" data-wk="1" aria-label="Nächste Woche">'+ICO.next+'</button>'
     +(mon!==mondayOf(td)?'<button class="btn today" data-wk="0">Heute</button>':'')+'</div>'
-    +'<div class="nav"><button class="btn ghost" data-acct="1">Konto</button><button class="btn ghost" data-ics="1">Kalender-Export</button><button class="btn" data-newblock="1">+ Lernblock</button></div></div>';
+    +'<div class="nav"><button class="btn ghost small" data-ics="1">Exportieren</button><button class="btn small" data-newblock="1">+ Block</button></div></div>';
   if(dates[6]>=s.examStart&&mon<=s.examEnd)o+='<div class="banner exam">Klausurenphase '+fmtShort(s.examStart)+'–'+fmtDate(s.examEnd)+'. Die genauen Termine kommen mit dem Prüfungsplan; dann plane ich die Lernblöcke rückwärts.</div>';
   else if(dates.some(inBreak))o+='<div class="banner">Weihnachtspause: keine Vorlesungen. Zeit für Altklausuren.</div>';
   else if(mon>s.examEnd)o+='<div class="banner">Das Semester ist vorbei.</div>';
@@ -660,17 +730,26 @@ function weekView(){
       if(it.kind==='study'){
         var mark=b.done?'<span class="mark ok" aria-label="gelernt">'+ICO.check+'</span>':(past?'<span class="mark" aria-label="noch nicht bestätigt">?</span>':'');
         o+='<div class="blk study'+(b.done?' done':'')+(S.modules[b.moduleId]?'':' nomod')+'" role="button" tabindex="0" data-bid="'+esc(b.id)+'" style="'+style+'" title="'+esc(m.name)+' · Lernblock · verschieben durch Ziehen">'+mark
-          +'<b>'+esc(m.short||m.name)+'</b><span class="t">'+esc(b.start)+'–'+esc(b.end)+'</span></div>';
+          +'<b>'+esc(m.short||m.name)+'</b><span class="t">'+esc(b.start)+'–'+esc(b.end)+'</span>'+(ht>60&&taskOf(b)?'<span class="k">'+esc(taskOf(b))+'</span>':'')+'</div>';
       }else{
         o+='<button class="blk" data-open="'+esc(b.moduleId)+'" style="'+style+'" title="'+esc(m.name)+' · '+(KIND[b.kind]||'')+'"><b>'+esc(m.short||m.name)+'</b><span class="t">'+esc(b.start)+'–'+esc(b.end)+(ht>42?' · '+(KIND[b.kind]||''):'')+'</span></button>';
       }
     });
     o+='</div>';
   });
-  o+='</div></div><div class="legend"><span><i></i>Vorlesung / Praktikum</span><span><i class="s"></i>Lernblock: ziehen zum Verschieben, tippen zum Bearbeiten</span><span>Leere Stelle antippen: neuer Lernblock</span><span>? = vorbei, noch nicht als gelernt bestätigt</span></div></div>';
-  o+='<div class="grid2 wkside"><div class="panel"><h3>Nächste Termine</h3><ul class="plain" style="margin-top:12px">'+upcoming()+'</ul></div>'
-     +'<div class="panel"><h3>Stunden in dieser Woche</h3>'+weekBox(mon)+'</div></div></div>';
+  o+='</div></div></div>';
+  o+='<div class="grid2 wkside"><div class="panel"><h3>Deine Aufgaben diese Woche</h3>'+weekTasks(dates)+'</div>'
+     +'<div class="stack"><div class="panel"><h3>Stunden</h3>'+weekBox(mon)+'</div><div class="panel"><h3>Nächste Termine</h3><ul class="plain" style="margin-top:8px">'+upcoming()+'</ul></div></div></div></div>';
   return o;
+}
+function weekTasks(dates){
+  var td=today(),o='';
+  dates.forEach(function(d,i){
+    var bl=studyOn(d).sort(function(a,b){return hm(a.start)-hm(b.start)});if(!bl.length)return;
+    o+='<div class="wtday'+(d===td?' today':'')+(d<td?' past':'')+'"><div class="wtd">'+['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][i]+'<span>'+fmtShort(d)+'</span></div>'
+      +bl.map(function(b){var m=modOf(b.moduleId),t=taskOf(b);
+        return '<button class="wt'+(b.done?' done':'')+'" data-tblk="'+esc(b.id)+'" style="--h:'+(m.hue||210)+'"><span class="wtt">'+esc(b.start)+'</span><span class="wtn"><b>'+esc(m.name)+'</b>'+(t?'<span>'+esc(t)+'</span>':'')+'</span>'+(b.done?'<span class="wtok">'+ICO.check+'</span>':'')+'</button>'}).join('')+'</div>'});
+  return o||'<div class="empty" style="margin-top:12px">Diese Woche ist noch nichts geplant.</div>';
 }
 function layout(list){
   var res={},groups=[],cur=null,end=0;
@@ -691,9 +770,9 @@ function weekBox(mon){
   var r=weekRange(mon), done=sumMin(function(l){return l.date>=r[0]&&l.date<=r[1]});
   var plan=studyArr().filter(function(b){return b.date>=r[0]&&b.date<=r[1]}).reduce(function(a,b){return a+dur(b)},0);
   var p=plan?Math.min(100,Math.round(100*done/plan)):0;
-  return '<div style="margin-top:12px"><div class="mono" style="font-size:22px">'+fmtH(done)+'<span class="muted" style="font-size:14px"> von '+fmtH(plan)+' geplant</span></div>'
+  return '<div style="margin-top:12px"><div class="mono" style="font-size:22px">'+fmtH(done)+'<span class="muted" style="font-size:14px"> von '+fmtH(plan)+' erledigt</span></div>'
     +'<div class="bar h'+(p>=100?' ok':'')+'"><i style="width:'+p+'%"></i></div>'
-    +'<p class="hint">Geplant = Summe der Lernblöcke dieser Woche. Gelernt = Stoppuhr, nachgetragene Zeit und als gelernt bestätigte Lernblöcke.</p></div>';
+    +'</div>';
 }
 
 function moduleList(){
@@ -792,7 +871,7 @@ function trainPanel(){
     o+=plannedList(dir);
     if(err)o+='<p class="hint">Live-Daten gerade nicht erreichbar: '+esc(err)+'</p>';
   }else o+='<div class="empty" style="margin-top:10px">Lade Verbindungen …</div>';
-  o+=trLinks(dir)+'<div class="frow" style="margin-top:12px;justify-content:space-between"><button class="btn ghost small" data-trrefresh="1">Aktualisieren</button><button class="btn ghost small" data-trset="1">Fahrzeit einstellen</button></div></div>';
+  o+='<div class="trfoot"><button class="lnk" data-trrefresh="1">Aktualisieren</button><button class="lnk" data-trset="1">Fahrzeit</button><details><summary class="lnk">Andere Apps</summary>'+trLinks(dir)+'</details></div></div>';
   return o;
 }
 function openCommuteSettings(){
@@ -816,9 +895,7 @@ function todayView(){
   var cms=commutesOn(t);if(cms.length){items.unshift({b:cms[0],cm:true});items.push({b:cms[1],cm:true})}
   var planned=studyOn(t).reduce(function(a,b){return a+dur(b)},0);
   var o='<div class="hero"><div class="hello"><b>'+greet()+', Tobi</b><span>'+['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][wday(t)]+', '+fmtDate(t)+(lecturesOn(t).length+studyOn(t).length?' · '+(lecturesOn(t).length+studyOn(t).length)+(lecturesOn(t).length+studyOn(t).length===1?' Termin':' Termine')+' heute':'')+'</span></div>'
-    +'<div class="pill lv"><span class="pl">Level '+x.lv+' · <span class="lvtitle">'+esc(x.title)+'</span></span><span class="pv">'+x.xp+'<small> XP</small></span><div class="bar"><i style="width:'+x.p+'%"></i></div><span class="ps">noch '+(x.need-x.cur)+' XP bis Level '+(x.lv+1)+'</span></div>'
-    +'<div class="pill fire"><span class="pl">Serie</span><span class="pv">'+st.n+'<small> '+(st.n===1?'Tag':'Tage')+'</small></span><span class="ps">'+(st.today?'Heute schon dabei. Weiter so!':st.n?'Trag heute etwas ein, dann hält die Serie.':'Trag heute etwas ein und starte eine Serie.')+'</span></div>'
-    +'<div class="pill"><span class="pl">Heute gemacht</span><span class="pv">'+fmtH(dm)+(planned?'<small> / '+fmtH(planned)+'</small>':'')+'</span><span class="ps">'+(planned?'geplant laut Kalender':'Stoppuhr, Nachtragen oder Blöcke abhaken')+'</span></div></div>';
+    +'<div class="stats"><div><span>Heute</span><b>'+fmtH(dm)+(planned?'<small> / '+fmtH(planned)+'</small>':'')+'</b></div><div><span>Serie</span><b>'+st.n+'<small> '+(st.n===1?'Tag':'Tage')+'</small></b></div><div><span>Level '+x.lv+'</span><b>'+x.xp+'<small> XP</small></b></div></div></div>';
   // Tagesablauf
   var tl='<div class="panel"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Dein Tag</h3><button class="btn small" data-newblock="today">+ Block</button></div>';
   if(!items.length)tl+='<div class="empty" style="margin-top:12px">Heute ist nichts geplant. Plan dir einen Block für ein Projekt oder fürs Gym.</div>';
@@ -826,9 +903,9 @@ function todayView(){
     var nowSet=false;
     tl+='<div class="tlist">'+items.map(function(it){
       var b=it.b,m=modOf(b.moduleId),s=hm(b.start),e=hm(b.end),past=e<=now,cur=!past&&s<=now&&!nowSet;if(cur)nowSet=true;
-      if(it.cm)return '<div class="titem commute'+(past&&!cur?' past':'')+(cur?' now':'')+'"><button class="tmain" data-trdir="'+b.dir+'"><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(b.dir==='hin'&&b.dep?'S-Bahn '+b.dep+' ab Grafing Bahnhof':'Heimfahrt mit der S-Bahn')+'</b><span>'+(b.dir==='hin'?'an Hochschule ca. '+esc(b.end):'S-Bahn Richtung Grafing, etwa alle 20 min')+(cur?'<span class="nowtag">jetzt</span>':'')+'</span></span></button><button class="tq" data-trdir="'+b.dir+'">Verbindungen</button></div>';
-      var cls='titem'+(it.lec?' lec':'')+(past&&!cur?' past':'')+(cur?' now':''),kind=it.lec?(KIND[b.kind]||''):(isStudy(m)?'Lernblock':AREAS[areaOf(m)].n);
-      var main='<button class="tmain" '+(it.lec?'data-open="'+esc(b.moduleId)+'"':'data-tblk="'+esc(b.id)+'"')+'><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(m.name)+'</b><span>'+esc(kind)+(cur?'<span class="nowtag">jetzt</span>':'')+'</span></span></button>';
+      if(it.cm)return '<div class="titem commute'+(past&&!cur?' past':'')+(cur?' now':'')+'"><button class="tmain" data-trdir="'+b.dir+'"><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(b.dir==='hin'&&b.dep?'S-Bahn '+b.dep+' ab Grafing':'Heimfahrt')+'</b><span>'+(b.dir==='hin'?'an Hochschule ca. '+esc(b.end):'S-Bahn etwa alle 20 min')+(cur?'<span class="nowtag">jetzt</span>':'')+'</span></span></button><button class="tq" data-trdir="'+b.dir+'">Live</button></div>';
+      var cls='titem'+(it.lec?' lec':'')+(past&&!cur?' past':'')+(cur?' now':''),kind=it.lec?(KIND[b.kind]||''):(taskOf(b)||(isStudy(m)?'Lernblock':AREAS[areaOf(m)].n));
+      var main='<button class="tmain" '+(it.lec?'data-open="'+esc(b.moduleId)+'"':'data-tblk="'+esc(b.id)+'"')+'><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(m.name)+(cur?'<span class="nowtag">jetzt</span>':'')+'</b><span>'+esc(kind)+'</span></span></button>';
       var q=it.lec?'':'<button class="tq'+(b.done?' done':'')+'" data-quickdone="'+esc(b.id)+'">'+(b.done?'✓ Erledigt':'Erledigt?')+'</button>';
       return '<div class="'+cls+'" style="--h:'+(m.hue||210)+'">'+main+q+'</div>'}).join('')+'</div>';
   }
@@ -853,7 +930,7 @@ function todayView(){
   var nd='',cand=pl.filter(function(m){return !m.until||m.until>=today()}).map(function(m){var l=lastLog(m.id);return {m:m,days:l?-daysUntil(l):999}}).filter(function(c){return c.days>=3}).sort(function(a,b){return b.days-a.days})[0];
   if(cand)nd='<div class="nudge"><p>'+(cand.days>=999?'Für <b>'+esc(cand.m.name)+'</b> hast du noch nichts eingetragen.':'Seit '+cand.days+' Tagen nichts für <b>'+esc(cand.m.name)+'</b> gemacht.')+' Wie wäre es heute mit 30 Minuten?</p>'
     +(S.timer?'':'<button class="btn small" data-timer="start" data-mod="'+esc(cand.m.id)+'">Jetzt starten</button>')+'</div>';
-  return o+'<div class="grid2" style="margin-top:16px"><div class="stack">'+coachToday()+nd+tl+'</div><div class="stack">'+habitsPanel()+trainPanel()+ps+wg+'<button class="btn ghost small" data-acct="1" style="align-self:flex-start">Konto & Daten</button></div></div>';
+  return o+'<div class="grid2" style="margin-top:16px"><div class="stack">'+coachToday()+tl+'</div><div class="stack">'+habitsPanel()+trainPanel()+'</div></div>';
 }
 
 
@@ -886,7 +963,7 @@ function proposalHtml(c){
   if(!pr.length)return '';
   var past=pr[pr.length-1].date<today();
   return '<h4 style="margin:14px 0 2px;font-size:15px">'+(c.type==='week'?'Vorschlag für die Woche':'Vorschlag für deinen Plan')+'</h4><ul class="cprop">'+pr.map(function(b){var m=modOf(b.moduleId);
-      return '<li><b>'+esc(dayLabel(b.date))+' '+esc(b.start)+'</b><span>'+esc(m.short||m.name)+(b.note?' · '+esc(b.note):'')+'</span></li>'}).join('')+'</ul>'
+      return '<li><b>'+esc(dayLabel(b.date))+' '+esc(b.start)+'</b><span>'+esc(m.short||m.name)+((b.task||b.note)?' · '+esc(b.task||b.note):'')+'</span></li>'}).join('')+'</ul>'
     +(c.applied?'<p class="hint">Übernommen'+(c.appliedAt?' am '+fmtDate(c.appliedAt.slice(0,10)):'')+'. Du kannst jeden Block im Kalender weiter ändern.</p>'
       :past?'':'<div class="frow" style="margin-top:10px"><button class="btn small" data-coach="apply|'+esc(c.id)+'">Plan übernehmen</button><span class="hint" style="margin:0">ersetzt deine noch offenen Blöcke in diesen Tagen</span></div>');
 }
@@ -907,14 +984,14 @@ function habitsPanel(){
   var hm_=habitMods();if(!hm_.length)return '';
   return '<div class="panel"><h3>Diese Woche</h3><div style="margin-top:6px">'+hm_.map(function(m){
     var n=weekSessions(m),g=+m.weeklyCount,p=Math.min(100,Math.round(100*n/g));
-    var extra=m.until?' · noch '+Math.max(0,daysUntil(m.until))+' Tage':'';
-    return '<div class="goal" style="--h:'+(m.hue||210)+'"><div class="row"><b>'+esc(m.name)+'</b><span>'+n+' von '+g+(n>=g?' ✓':'')+extra+'</span></div><div class="bar"><i style="width:'+p+'%;background:hsl(var(--h) 60% 45%)"></i></div></div>'}).join('')
-    +'</div><p class="hint">Zählt Tage, an denen du einen Block abgehakt oder Zeit eingetragen hast.</p></div>';
+    var extra=m.until?' · '+Math.max(0,daysUntil(m.until))+' T':'';
+    return '<div class="goal" style="--h:'+(m.hue||210)+'"><div class="row"><b>'+esc(m.name)+'</b><span>'+n+' / '+g+(n>=g?' ✓':'')+extra+'</span></div><div class="bar"><i style="width:'+p+'%;background:hsl(var(--h) 60% 45%)"></i></div></div>'}).join('')
+    +'</div></div>';
 }
 function coachToday(){
   var t=today(),vis=coachArr().filter(function(c){return c.date===t&&coachVisible(c)}).sort(coachOrder);
   var ci=S.checkins[t],eve=nowMin()>=1200;
-  var o='<div class="panel cmini"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Coach</h3><button class="btn ghost small" data-tab="coach">Öffnen</button></div>';
+  var o='<div class="panel cmini"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Coach</h3><button class="lnk" data-tab="coach">Alles lesen</button></div>';
   if(vis.length)o+=entryHtml(vis[vis.length-1],false);
   else o+='<div class="cwait">'+(nowMin()<360?'Dein Morgenbriefing kommt um 6 Uhr.':'Das Briefing für heute ist noch nicht da.')+'</div>';
   if(eve&&!ci)o+='<div class="frow" style="margin-top:12px"><button class="btn small" data-coach="checkin">Abend-Check-in (2 Min.)</button></div>';
@@ -980,7 +1057,7 @@ function coachAction(a,t){
     var ds=c.proposal.map(function(b){return b.date}).sort(),from=ds[0],to=ds[ds.length-1];
     var old=studyArr().filter(function(b){return b.date>=from&&b.date<=to&&!b.done&&b.date>=today()});
     Promise.all(old.map(function(b){return S.db.doc('study/'+b.id).delete()}))
-      .then(function(){return Promise.all(c.proposal.filter(function(b){return b.date>=today()}).map(function(b,i){var o2={moduleId:b.moduleId,date:b.date,start:b.start,end:b.end,coach:c.id};return S.db.doc('study/cp-'+c.id+'-'+i).set(o2)}))})
+      .then(function(){return Promise.all(c.proposal.filter(function(b){return b.date>=today()}).map(function(b,i){var o2={moduleId:b.moduleId,date:b.date,start:b.start,end:b.end,coach:c.id};if(b.task)o2.task=b.task;return S.db.doc('study/cp-'+c.id+'-'+i).set(o2)}))})
       .then(function(){return upd('coach/'+c.id,{applied:true,appliedAt:new Date().toISOString()})})
       .then(function(){toast('Wochenplan übernommen.')}).catch(saveErr);
   }
@@ -1168,7 +1245,8 @@ function closeSheet(){$('sheet').hidden=true;$('sheet').innerHTML=''}
 function blockForm(b,isNew){
   return '<h2>'+(isNew?'Neuer Block':'Block')+'</h2>'
     +'<label class="field">Modul oder Projekt<select id="bmod">'+modOptions(b.moduleId)+'</select></label>'
-    +'<div class="frow"><label class="field">Datum<input type="date" id="bdate" value="'+esc(b.date)+'"></label><label class="field">Von<input type="time" step="900" id="bstart" value="'+esc(b.start)+'"></label><label class="field">Bis<input type="time" step="900" id="bend" value="'+esc(b.end)+'"></label></div>';
+    +'<div class="frow"><label class="field">Datum<input type="date" id="bdate" value="'+esc(b.date)+'"></label><label class="field">Von<input type="time" step="900" id="bstart" value="'+esc(b.start)+'"></label><label class="field">Bis<input type="time" step="900" id="bend" value="'+esc(b.end)+'"></label></div>'
+    +'<label class="field">Aufgabe<textarea id="btask" rows="2" placeholder="Was genau machst du in diesem Block?">'+esc(b.task||'')+'</textarea></label>';
 }
 function openNewBlock(date,start){
   var st=start||'14:00',b={moduleId:(mods()[0]||{}).id,date:date||addDays(S.week,Math.min(S.day,6)),start:st,end:hmStr(hm(st)+90)};
@@ -1184,7 +1262,7 @@ function openBlock(id){
     +'<div class="frow"><button class="btn '+(b.done?'ghost':'')+'" data-sheet="done">'+(b.done?'Doch nicht erledigt':'Als erledigt eintragen ('+fmtMin(dur(b))+')')+'</button></div>'
     +'<div class="frow" style="justify-content:space-between"><button class="btn danger" data-sheet="del">Löschen</button><span class="frow"><button class="btn ghost" data-sheet="close">Abbrechen</button><button class="btn" data-sheet="save">Speichern</button></span></div>');
 }
-function readForm(){var st=$('bstart').value||'14:00',en=$('bend').value||hmStr(hm(st)+90);if(hm(en)<=hm(st))en=hmStr(hm(st)+30);return {moduleId:$('bmod').value||(mods()[0]||{}).id,date:$('bdate').value||today(),start:st,end:en}}
+function readForm(){var st=$('bstart').value||'14:00',en=$('bend').value||hmStr(hm(st)+90);if(hm(en)<=hm(st))en=hmStr(hm(st)+30);return {moduleId:$('bmod').value||(mods()[0]||{}).id,date:$('bdate').value||today(),start:st,end:en,task:($('btask')&&$('btask').value.trim())||''}}
 function sheetAction(a,btn){
   if(a==='close'){closeSheet();return}
   if(a==='cmsave'){
@@ -1201,7 +1279,7 @@ function sheetAction(a,btn){
   if(a==='create'){
     var f=readForm(),rep=$('brep').value==='1',ser=rep?'s'+uid():null,dates=[f.date];
     if(rep){var d=f.date;while((d=addDays(d,7))<=sem().lectEnd)dates.push(d)}
-    var ps=dates.map(function(d){var o={moduleId:f.moduleId,date:d,start:f.start,end:f.end};if(ser)o.series=ser;return S.db.collection('study').doc(f.moduleId+'-'+uid()).set(o)});
+    var ps=dates.map(function(d){var o={moduleId:f.moduleId,date:d,start:f.start,end:f.end};if(f.task)o.task=f.task;if(ser)o.series=ser;return S.db.collection('study').doc(f.moduleId+'-'+uid()).set(o)});
     Promise.all(ps).then(function(){toast(dates.length>1?dates.length+' Lernblöcke angelegt.':'Lernblock angelegt.')}).catch(saveErr);closeSheet();return;
   }
   var id=S.sheetBlock,b=S.study[id];if(!b){closeSheet();return}
@@ -1210,7 +1288,7 @@ function sheetAction(a,btn){
   var targets=scope==='next'?studyArr().filter(function(x){return x.series===b.series&&x.date>=b.date}):[b];
   if(a==='save'){
     var f2=readForm(),shift=Math.round((parseYmd(f2.date)-parseYmd(b.date))/864e5);
-    targets.forEach(function(x){upd('study/'+x.id,{moduleId:f2.moduleId,start:f2.start,end:f2.end,date:x.id===id?f2.date:addDays(x.date,shift)})});
+    targets.forEach(function(x){var u={moduleId:f2.moduleId,start:f2.start,end:f2.end,date:x.id===id?f2.date:addDays(x.date,shift)};if(x.id===id)u.task=f2.task;upd('study/'+x.id,u)});
     closeSheet();return;
   }
   if(a==='del'){
