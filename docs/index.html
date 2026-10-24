@@ -767,6 +767,7 @@ function trainPanel(){
         +'<div class="ci"><b>'+lines+' '+esc((f.direction||'').slice(0,28))+'</b><span>'+st+(f.departurePlatform?' · Gleis '+esc(f.departurePlatform):'')+' · an '+hhmm(la.arrival||la.plannedArrival)+' · '+mins+' min'+(legs.length>1?' · '+(legs.length-1)+'× umsteigen':'')+'</span></div></div>'}).join('')+'</div>';
   }else if(err||TR.live===false){
     o+=plannedList(dir);
+    if(err)o+='<p class="hint">Live-Daten gerade nicht erreichbar: '+esc(err)+'</p>';
   }else o+='<div class="empty" style="margin-top:10px">Lade Verbindungen …</div>';
   o+=trLinks(dir)+'<div class="frow" style="margin-top:12px;justify-content:space-between"><button class="btn ghost small" data-trrefresh="1">Aktualisieren</button><button class="btn ghost small" data-trset="1">Fahrzeit einstellen</button></div></div>';
   return o;
