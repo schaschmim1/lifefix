@@ -47,39 +47,23 @@ a{color:var(--acc)}
 <div class="card" id="conns"></div>
 <div class="card" id="board"></div>
 <button class="btn" id="refresh">Aktualisieren</button>
-<p class="foot">Live-Daten der Deutschen Bahn über transport.rest · aktualisiert sich jede Minute</p>
+<p class="foot">Live-Daten vom MVV · aktualisiert sich jede Minute</p>
 </main>
+<script src="../config.js"></script>
 <script>
-/* Einstellungen: über die Adresse änderbar, z. B. ?home=Ebersberg */
-var P=new URLSearchParams(location.search);
-var CFG={
-  home:P.get('home')||'Grafing Bahnhof',
-  dest:P.get('dest')||'Hochschule München, Lothstraße 34',
-  lat:+(P.get('lat')||48.15466),lon:+(P.get('lon')||11.55374),
-  api:'https://v6.db.transport.rest'
-};
-var st={dir:null,ids:{}};
-try{st.ids=JSON.parse(localStorage.getItem('zug_ids')||'{}')}catch(e){}
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function hhmm(iso){if(!iso)return'';var d=new Date(iso);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function lineCls(n){n=String(n||'');return /^S/.test(n)?'':/^U/.test(n)?'u':/^(Tram|STR)/i.test(n)?'t':/^Bus/i.test(n)?'b':'r'}
-function api(path){
+/* Die Daten (MVV) kommen über eine kleine Funktion in Supabase, weil der MVV keine direkten Abrufe von Webseiten erlaubt */
+var CFG={home:'Grafing Bahnhof',base:((window.PLAN_CONFIG||{}).supabaseUrl||'')+'/functions/v1/zug'};
+var st={dir:null};
+function api(q){
   var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},12000);
-  return fetch(CFG.api+path,{signal:ctl.signal}).then(function(r){clearTimeout(tm);if(!r.ok)throw new Error('Server antwortet nicht ('+r.status+')');return r.json()});
+  return fetch(CFG.base+q,{signal:ctl.signal}).then(function(r){clearTimeout(tm);return r.json().catch(function(){return{}}).then(function(j){if(!r.ok||j.error)throw new Error(j.error||('Server antwortet nicht ('+r.status+')'));return j})});
 }
-/* Ein Fehler beim Bahn-Server ist oft nur kurz: einmal nach 2 s neu versuchen */
-function apiRetry(path){return api(path).catch(function(){return new Promise(function(r){setTimeout(r,2000)}).then(function(){return api(path)})})}
-function station(q){
-  if(st.ids[q])return Promise.resolve(st.ids[q]);
-  return apiRetry('/locations?query='+encodeURIComponent(q)+'&results=1&addresses=false&poi=false').then(function(r){
-    if(!r[0])throw new Error('Haltestelle „'+q+'“ nicht gefunden');
-    st.ids[q]={id:r[0].id,name:r[0].name};try{localStorage.setItem('zug_ids',JSON.stringify(st.ids))}catch(e){}
-    return st.ids[q];
-  });
-}
+function apiRetry(q){return api(q).catch(function(){return new Promise(function(r){setTimeout(r,2000)}).then(function(){return api(q)})})}
 function autoDir(){return new Date().getHours()<13?'hin':'rueck'}
-function dest(prefix){return prefix+'address='+encodeURIComponent(CFG.dest)+'&'+prefix+'latitude='+CFG.lat+'&'+prefix+'longitude='+CFG.lon}
 function journeyHtml(j,now){
   var legs=(j.legs||[]).filter(function(l){return !l.walking}),f=legs[0],a=j.legs[0],z=j.legs[j.legs.length-1];if(!f)return'';
   var dl=f.departureDelay,dep=f.departure||f.plannedDeparture,gone=new Date(dep).getTime()<now-60000;
@@ -102,26 +86,19 @@ function load(){
   $('#route').textContent=dir==='hin'?CFG.home+' → Hochschule':'Hochschule → '+CFG.home;
   $('#upd').textContent='lädt …';
   if(!$('#conns').innerHTML)$('#conns').innerHTML='<p class="msg">Lade Verbindungen …</p>';
-  station(CFG.home).then(function(h){
-    var q=dir==='hin'?'from='+encodeURIComponent(h.id)+'&'+dest('to.'):dest('from.')+'&to='+encodeURIComponent(h.id);
-    var jr=apiRetry('/journeys?'+q+'&results=5&stopovers=false&remarks=false&language=de');
-    /* Abfahrtstafel: morgens Grafing, nachmittags Hackerbrücke */
-    var bq=dir==='hin'?Promise.resolve(h):station('München Hackerbrücke');
-    var br=bq.then(function(s){return apiRetry('/stops/'+encodeURIComponent(s.id)+'/departures?duration=60&results=8&language=de&remarks=false').then(function(r){return{s:s,d:r.departures||r}})});
-    return Promise.all([jr,br.catch(function(e){return{err:e}})]);
-  }).then(function(r){
+  Promise.all([apiRetry('?dir='+dir),apiRetry('?board=1').catch(function(e){return{err:e}})]).then(function(r){
     var js=r[0].journeys||[];
     $('#conns').innerHTML='<h2>Verbindungen</h2>'+(js.length?js.map(function(j){return journeyHtml(j,now)}).join(''):'<p class="msg">Keine Verbindungen gefunden.</p>');
     var b=r[1];
     if(b.err)$('#board').innerHTML='<h2>Abfahrten</h2><p class="msg">Abfahrtstafel gerade nicht erreichbar.</p>';
     else{
-      var ds=(b.d||[]).filter(function(d){return dir==='rueck'?/grafing|ebersberg|kreuzstra/i.test(d.direction||''):/m(ü|ue)nchen|tutzing|geltendorf|pasing|ost|hbf|hauptbahnhof/i.test((d.direction||'')+' '+(d.line&&d.line.name||''))});
-      $('#board').innerHTML='<h2>Abfahrten '+esc(b.s.name)+(dir==='rueck'?' Richtung Grafing':' Richtung München')+'</h2>'+(ds.length?ds.slice(0,6).map(function(d){return depHtml(d,now)}).join(''):'<p class="msg">In der nächsten Stunde keine passende Abfahrt.</p>');
+      var ds=(b.departures||[]).filter(function(d){return new Date(d.when).getTime()>now-60000});
+      $('#board').innerHTML='<h2>Abfahrten Grafing Bahnhof</h2>'+(ds.length?ds.slice(0,8).map(function(d){return depHtml(d,now)}).join(''):'<p class="msg">Keine Abfahrten gefunden.</p>');
     }
     $('#upd').textContent='live · '+hhmm(new Date().toISOString());
   }).catch(function(e){
     $('#upd').innerHTML='<span class="err">offline</span>';
-    $('#conns').innerHTML='<h2>Verbindungen</h2><p class="msg err">Bahn-Server gerade nicht erreichbar ('+esc(e.name==='AbortError'?'Zeitüberschreitung':e.message)+'). Ich versuche es jede Minute neu.</p><p class="msg"><a href="https://www.bahnhof.de/'+(dir==='hin'?'grafing-bahnhof':'muenchen-hackerbruecke')+'/abfahrt" target="_blank" rel="noopener">Abfahrtstafel bei bahnhof.de öffnen</a></p>';
+    $('#conns').innerHTML='<h2>Verbindungen</h2><p class="msg err">Bahn-Server gerade nicht erreichbar ('+esc(e.name==='AbortError'?'Zeitüberschreitung':e.message)+'). Ich versuche es jede Minute neu.</p><p class="msg"><a href="https://www.bahnhof.de/grafing-bahnhof/abfahrt" target="_blank" rel="noopener">Abfahrtstafel bei bahnhof.de öffnen</a></p>';
   }).then(function(){busy=false});
 }
 document.querySelectorAll('[data-dir]').forEach(function(b){b.onclick=function(){st.dir=b.dataset.dir;$('#conns').innerHTML='';$('#board').innerHTML='';load()}});

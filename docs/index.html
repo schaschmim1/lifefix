@@ -626,7 +626,7 @@ function weekView(){
       var style='--h:'+(m.hue||210)+';top:'+top+'px;height:'+ht+'px;left:calc('+(ln.i*w)+'% + 1px);width:calc('+w+'% - 2px)';
       var past=d<td||(d===td&&hm(b.end)<=new Date().getHours()*60+new Date().getMinutes());
       if(it.kind==='commute'){
-        o+='<button class="blk commute" data-trset="1" style="top:'+top+'px;height:'+ht+'px;left:1px;width:calc(100% - 2px)" title="'+esc(b.label)+' '+esc(b.start)+'–'+esc(b.end)+'"><b>'+(b.dir==='hin'&&b.dep?'S4 '+esc(b.dep)+' ab Grafing':'Heimfahrt S4')+'</b>'+(ht>34?'<span class="t">'+(b.dir==='hin'?'an Hochschule ca. '+esc(b.end):'ab Hackerbrücke, alle 20 min')+'</span>':'')+'</button>';return;
+        o+='<button class="blk commute" data-trset="1" style="top:'+top+'px;height:'+ht+'px;left:1px;width:calc(100% - 2px)" title="'+esc(b.label)+' '+esc(b.start)+'–'+esc(b.end)+'"><b>'+(b.dir==='hin'&&b.dep?'S-Bahn '+esc(b.dep)+' ab Grafing':'Heimfahrt')+'</b>'+(ht>34?'<span class="t">'+(b.dir==='hin'?'an Hochschule ca. '+esc(b.end):'ab Hackerbrücke, alle 20 min')+'</span>':'')+'</button>';return;
       }
       if(it.kind==='study'){
         var mark=b.done?'<span class="mark ok" aria-label="gelernt">'+ICO.check+'</span>':(past?'<span class="mark" aria-label="noch nicht bestätigt">?</span>':'');
@@ -683,44 +683,38 @@ function nextDate(m){var t=today();return (m.dates||[]).filter(function(d){retur
 var COMMUTE_DEF={enabled:true,home:'Grafing Bahnhof',dest:'Hochschule München, Lothstraße 34',destLat:48.15466,destLon:11.55374,there:55,back:55};
 function commute(){return Object.assign({},COMMUTE_DEF,S.settings.commute||{})}
 /* Fahrt vor der ersten und nach der letzten Vorlesung/Praktikum eines Tages (wird berechnet, nicht gespeichert) */
-/* Fahrplan (offizieller Aushang Grafing Bahnhof, Mo–Fr): S4 Richtung München tagsüber zur Minute :14, :34, :54.
-   Fahrzeit S4 Grafing Bf → Hackerbrücke rund 35 min, dann rund 15 min zu Fuß zur Lothstraße. Ohne Gewähr, ändert sich mit dem Fahrplanwechsel. */
+/* Fahrplan (offizieller Aushang Grafing Bahnhof, Mo–Fr): S-Bahn Richtung München tagsüber zur Minute :14, :34, :54.
+   Fahrzeit S-Bahn Grafing Bf → Hackerbrücke rund 35 min, dann rund 15 min zu Fuß zur Lothstraße. Ohne Gewähr, ändert sich mit dem Fahrplanwechsel. */
 var TT={mins:[14,34,54],from:5*60+14,to:22*60+54,ride:35,walk:15,buffer:5,backRide:35};
 function s4Deps(fromMin,toMin){var r=[];for(var h=0;h<24;h++)TT.mins.forEach(function(m){var t=h*60+m;if(t>=TT.from&&t<=TT.to&&t>=fromMin&&t<=toMin)r.push(t)});return r}
-/* späteste S4, mit der man rechtzeitig zur ersten Vorlesung kommt */
+/* späteste S-Bahn, mit der man rechtzeitig zur ersten Vorlesung kommt */
 function trainFor(startMin){var latest=startMin-TT.buffer-TT.walk-TT.ride,d=s4Deps(0,latest);return d.length?d[d.length-1]:null}
 function commutesOn(d){
   var c=commute();if(!c.enabled)return [];
   var l=lecturesOn(d);if(!l.length)return [];
   var first=Math.min.apply(null,l.map(function(b){return hm(b.start)})),last=Math.max.apply(null,l.map(function(b){return hm(b.end)}));
   var dep=trainFor(first),hs=dep!=null?dep:first-(+c.there||55),he=dep!=null?dep+TT.ride+TT.walk:first;
-  return [{id:'hin-'+d,dir:'hin',date:d,start:hmStr(hs),end:hmStr(he),dep:dep!=null?hmStr(dep):null,label:dep!=null?'S4 '+hmStr(dep)+' ab Grafing Bf':'Fahrt zur Hochschule'},
-          {id:'rueck-'+d,dir:'rueck',date:d,start:hmStr(last),end:hmStr(last+(+c.back||55)),label:'Heimfahrt, S4 ab Hackerbrücke'}];
+  return [{id:'hin-'+d,dir:'hin',date:d,start:hmStr(hs),end:hmStr(he),dep:dep!=null?hmStr(dep):null,label:dep!=null?'S-Bahn '+hmStr(dep)+' ab Grafing Bf':'Fahrt zur Hochschule'},
+          {id:'rueck-'+d,dir:'rueck',date:d,start:hmStr(last),end:hmStr(last+(+c.back||55)),label:'Heimfahrt, S-Bahn ab Hackerbrücke'}];
 }
 var TR={dir:null,data:{},err:{},busy:{},at:{},ids:{},live:null};
 function trDir(){
   if(TR.dir)return TR.dir;var t=today(),cs=commutesOn(t),now=new Date().getHours()*60+new Date().getMinutes();
   if(cs.length&&now>=hm(cs[0].end))return 'rueck';return 'hin';
 }
-function trApi(path){
-  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){ctl&&ctl.abort()},9000);
-  return fetch('https://v6.db.transport.rest'+path,{signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(tm);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()});
-}
-function trHome(){
-  var c=commute();if(TR.ids.home&&TR.ids.homeQ===c.home)return Promise.resolve(TR.ids.home);
-  return trApi('/locations?query='+encodeURIComponent(c.home)+'&results=1&addresses=false&poi=false').then(function(r){if(!r[0])throw new Error('Haltestelle nicht gefunden');TR.ids.home=r[0].id;TR.ids.homeQ=c.home;return r[0].id});
+function trApi(q){
+  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){ctl&&ctl.abort()},12000);
+  var base=((window.PLAN_CONFIG||{}).supabaseUrl||'')+'/functions/v1/zug';
+  return fetch(base+q,{signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(tm);return r.json().catch(function(){return {}}).then(function(j){if(!r.ok||j.error)throw new Error(j.error||('HTTP '+r.status));return j})});
 }
 function trLoad(dir,force){
-  if(TR.live===false)return;
   if(TR.busy[dir])return;if(!force&&TR.at[dir]&&Date.now()-TR.at[dir]<55000)return;
-  TR.busy[dir]=true;var c=commute(),dest='address='+encodeURIComponent(c.dest)+'&latitude='+c.destLat+'&longitude='+c.destLon;
-  var cs=commutesOn(today()),when=new Date();
+  TR.busy[dir]=true;var cs=commutesOn(today()),when=new Date();
   /* Hinweg: ab jetzt; Rückweg: frühestens ab Ende der letzten Vorlesung */
   if(dir==='rueck'&&cs.length){var e=hm(cs[1].start),now=when.getHours()*60+when.getMinutes();if(e>now){when=new Date();when.setHours(Math.floor(e/60),e%60,0,0)}}
-  trHome().then(function(home){
-    var q=dir==='hin'?'from='+encodeURIComponent(home)+'&to.'+dest.replace(/&/g,'&to.'):'from.'+dest.replace(/&/g,'&from.')+'&to='+encodeURIComponent(home);
-    return trApi('/journeys?'+q+'&results=4&stopovers=false&remarks=false&language=de&departure='+encodeURIComponent(when.toISOString()));
-  }).then(function(r){TR.data[dir]=r.journeys||[];TR.err[dir]=null;TR.at[dir]=Date.now();liveState(true)})
+  /* MVV-Daten kommen über eine kleine Funktion in Supabase (die Seite darf den MVV nicht direkt abrufen) */
+  trApi('?dir='+dir+'&at='+encodeURIComponent(when.toISOString()))
+  .then(function(r){TR.data[dir]=r.journeys||[];TR.err[dir]=null;TR.at[dir]=Date.now();liveState(true)})
   .catch(function(e){console.warn('Zugdaten',e);TR.err[dir]=e&&e.name==='AbortError'?'Zeitüberschreitung':String(e&&e.message||e);TR.at[dir]=Date.now();liveState(false)})
   .then(function(){TR.busy[dir]=false;if(S.tab==='today'&&!S.dragging&&!S.touching)render()});
 }
@@ -735,14 +729,14 @@ function plannedList(dir){
   var n=new Date(),now=n.getHours()*60+n.getMinutes(),wk=wday(today())<5;
   if(dir==='hin'){
     var deps=s4Deps(now-2,now+120).slice(0,4);
-    if(!wk)return '<p class="hint">Am Wochenende fährt die S4 anders. Schau bei den Live-Abfahrten unten.</p>';
-    if(!deps.length)return '<p class="hint">Heute fährt laut Fahrplan keine S4 mehr in diesem Zeitraum.</p>';
+    if(!wk)return '<p class="hint">Am Wochenende fährt die S-Bahn anders. Schau bei den Live-Abfahrten unten.</p>';
+    if(!deps.length)return '<p class="hint">Heute fährt laut Fahrplan keine S-Bahn mehr in diesem Zeitraum.</p>';
     return '<div style="margin-top:6px">'+deps.map(function(t){
-      return '<div class="conn"><div class="ct"><b>'+hmStr(t)+'</b></div><div class="ci"><b><span class="line">S4</span> Richtung München · Tutzing</b><span>ab Grafing Bahnhof · an Hackerbrücke ca. '+hmStr(t+TT.ride)+' · Hochschule ca. '+hmStr(t+TT.ride+TT.walk)+'</span></div></div>'}).join('')+'</div>'
+      return '<div class="conn"><div class="ct"><b>'+hmStr(t)+'</b></div><div class="ci"><b><span class="line">S</span> Richtung München</b><span>ab Grafing Bahnhof · an Hackerbrücke ca. '+hmStr(t+TT.ride)+' · Hochschule ca. '+hmStr(t+TT.ride+TT.walk)+'</span></div></div>'}).join('')+'</div>'
       +'<p class="hint">Fahrplan vom Aushang am Bahnhof, ohne Verspätungen. Für Live-Zeiten tipp auf „Live-Abfahrten“.</p>';
   }
   var cs=commutesOn(today()),from=cs.length?hm(cs[1].start):now;
-  return '<div class="conn"><div class="ct"><b>~'+hmStr(Math.max(now,from)+TT.walk)+'</b></div><div class="ci"><b><span class="line">S4</span> ab Hackerbrücke Richtung Grafing</b><span>tagsüber etwa alle 20 Minuten · Fahrzeit ca. '+TT.backRide+' min · erst ca. '+TT.walk+' min zu Fuß zur Hackerbrücke</span></div></div>'
+  return '<div class="conn"><div class="ct"><b>~'+hmStr(Math.max(now,from)+TT.walk)+'</b></div><div class="ci"><b><span class="line">S</span> ab Hackerbrücke Richtung Grafing</b><span>tagsüber etwa alle 20 Minuten · Fahrzeit ca. '+TT.backRide+' min · erst ca. '+TT.walk+' min zu Fuß zur Hackerbrücke</span></div></div>'
     +'<p class="hint">Genaue Zeiten und Verspätungen bei „Live-Abfahrten“.</p>';
 }
 function trLinks(dir){var c=commute(),a=dir==='hin'?c.home:c.dest,b=dir==='hin'?c.dest:c.home;
@@ -755,7 +749,7 @@ function trainPanel(){
   var cs=commutesOn(today()),list=TR.data[dir],err=TR.err[dir],now=Date.now();
   var o='<div class="panel train"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Zug</h3><span class="livebadge'+(list&&!err?' on':'')+'"><i></i>'+(list&&!err?'live · '+hhmm(new Date(TR.at[dir]).toISOString()):TR.busy[dir]?'lädt …':'laut Fahrplan')+'</span></div>'
     +'<div class="dirs"><button data-trdir="hin" aria-pressed="'+(dir==='hin')+'">Zur Hochschule</button><button data-trdir="rueck" aria-pressed="'+(dir==='rueck')+'">Nach Hause</button></div>';
-  if(cs.length)o+='<p class="hint">Laut Plan: '+(dir==='hin'?'S4 um '+(cs[0].dep||cs[0].start)+' ab Grafing, an der Hochschule ca. '+cs[0].end:'Vorlesungsende '+cs[1].start+', zu Hause gegen '+cs[1].end)+'.</p>';
+  if(cs.length)o+='<p class="hint">Laut Plan: '+(dir==='hin'?'S-Bahn um '+(cs[0].dep||cs[0].start)+' ab Grafing, an der Hochschule ca. '+cs[0].end:'Vorlesungsende '+cs[1].start+', zu Hause gegen '+cs[1].end)+'.</p>';
   else o+='<p class="hint">Heute keine Vorlesung.</p>';
   if(list&&list.length){
     o+='<div style="margin-top:6px">'+list.map(function(j){
@@ -778,7 +772,7 @@ function openCommuteSettings(){
     +'<label class="field">Start (Bahnhof)<input type="text" id="cmhome" value="'+esc(c.home)+'"></label>'
     +'<div class="frow"><label class="field">Hinfahrt (min, Tür zu Hörsaal)<input type="number" id="cmthere" min="0" step="5" value="'+esc(c.there)+'"></label><label class="field">Rückfahrt (min)<input type="number" id="cmback" min="0" step="5" value="'+esc(c.back)+'"></label></div>'
     +'<label class="field">Im Kalender anzeigen<select id="cmon"><option value="1"'+(c.enabled?' selected':'')+'>Ja, vor und nach Vorlesungen</option><option value="0"'+(c.enabled?'':' selected')+'>Nein</option></select></label>'
-    +'<p class="hint">Ziel ist die Hochschule München, Lothstraße 34. Für die Hinfahrt sucht die App die späteste S4 (Abfahrt :14, :34, :54), mit der du 5 Minuten vor der ersten Vorlesung da bist. Die Rückfahrt wird nach der letzten Vorlesung eingeplant. Die Minuten oben gelten nur, wenn keine passende S4 gefunden wird.</p>'
+    +'<p class="hint">Ziel ist die Hochschule München, Lothstraße 34. Für die Hinfahrt sucht die App die späteste S-Bahn (Abfahrt :14, :34, :54), mit der du 5 Minuten vor der ersten Vorlesung da bist. Die Rückfahrt wird nach der letzten Vorlesung eingeplant. Die Minuten oben gelten nur, wenn keine passende S4 gefunden wird.</p>'
     +'<div class="frow" style="justify-content:flex-end"><button class="btn ghost" data-sheet="close">Abbrechen</button><button class="btn" data-sheet="cmsave">Speichern</button></div>');
 }
 setInterval(function(){if(S.tab==='today'&&document.visibilityState!=='hidden'&&commute().enabled){var d=trDir();TR.at[d]=0;trLoad(d,true)}},60000);
@@ -803,7 +797,7 @@ function todayView(){
     var nowSet=false;
     tl+='<div class="tlist">'+items.map(function(it){
       var b=it.b,m=modOf(b.moduleId),s=hm(b.start),e=hm(b.end),past=e<=now,cur=!past&&s<=now&&!nowSet;if(cur)nowSet=true;
-      if(it.cm)return '<div class="titem commute'+(past&&!cur?' past':'')+(cur?' now':'')+'"><button class="tmain" data-trdir="'+b.dir+'"><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(b.dir==='hin'&&b.dep?'S4 '+b.dep+' ab Grafing Bahnhof':'Heimfahrt mit der S4')+'</b><span>'+(b.dir==='hin'?'an Hochschule ca. '+esc(b.end):'S4 Richtung Grafing, etwa alle 20 min')+(cur?'<span class="nowtag">jetzt</span>':'')+'</span></span></button><button class="tq" data-trdir="'+b.dir+'">Verbindungen</button></div>';
+      if(it.cm)return '<div class="titem commute'+(past&&!cur?' past':'')+(cur?' now':'')+'"><button class="tmain" data-trdir="'+b.dir+'"><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(b.dir==='hin'&&b.dep?'S-Bahn '+b.dep+' ab Grafing Bahnhof':'Heimfahrt mit der S-Bahn')+'</b><span>'+(b.dir==='hin'?'an Hochschule ca. '+esc(b.end):'S-Bahn Richtung Grafing, etwa alle 20 min')+(cur?'<span class="nowtag">jetzt</span>':'')+'</span></span></button><button class="tq" data-trdir="'+b.dir+'">Verbindungen</button></div>';
       var cls='titem'+(it.lec?' lec':'')+(past&&!cur?' past':'')+(cur?' now':''),kind=it.lec?(KIND[b.kind]||''):(isStudy(m)?'Lernblock':AREAS[areaOf(m)].n);
       var main='<button class="tmain" '+(it.lec?'data-open="'+esc(b.moduleId)+'"':'data-tblk="'+esc(b.id)+'"')+'><span class="tt">'+esc(b.start)+'<small>'+esc(b.end)+'</small></span><span class="tn"><b>'+esc(m.name)+'</b><span>'+esc(kind)+(cur?'<span class="nowtag">jetzt</span>':'')+'</span></span></button>';
       var q=it.lec?'':'<button class="tq'+(b.done?' done':'')+'" data-quickdone="'+esc(b.id)+'">'+(b.done?'✓ Erledigt':'Erledigt?')+'</button>';
