@@ -425,7 +425,7 @@ html.land .mcards{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
   .ring .rv{font-size:17px}
   .ring .rv small{font-size:13px}
   .ring .rs{display:none}
-  nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:35;border-radius:0;padding:0 0 env(safe-area-inset-bottom,0px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid var(--line)}
+  nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:35;border-radius:0;padding:0 0 env(safe-area-inset-bottom,0px);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid var(--line)}
   nav.tabs button{flex-direction:column;justify-content:center;gap:3px;height:58px;padding:0;font-size:11px;color:var(--muted);border-radius:0}
   nav.tabs button svg{display:block;width:24px;height:24px}
   nav.tabs button[aria-selected="true"]{background:transparent;box-shadow:none;color:var(--accent)}
@@ -441,6 +441,33 @@ html.land .mcards{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
   #toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Coach */
+.ctext{font-size:15px;line-height:1.55}
+.ctext p{margin:8px 0}
+.ctext h4{margin:14px 0 4px;font-size:15px;font-weight:700}
+.ctext ul{margin:6px 0;padding-left:20px}
+.ctext li{margin:3px 0}
+.centry{border-top:1px solid var(--line2);padding-top:12px;margin-top:12px}
+.centry:first-of-type{border-top:0;margin-top:6px;padding-top:0}
+.ckind{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink)}
+.cwait{color:var(--muted);font-size:14px;background:var(--bg);border-radius:14px;padding:14px 16px;margin-top:10px}
+.rate{display:flex;gap:6px;margin-top:6px}
+.rate button{flex:1;min-height:40px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;font-weight:600}
+.rate button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.field textarea{width:100%;min-height:64px;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);box-sizing:border-box;resize:vertical}
+details.cday{border-top:1px solid var(--line2);padding:10px 0}
+details.cday:first-of-type{border-top:0}
+details.cday summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.cday summary::-webkit-details-marker{display:none}
+details.cday summary span{color:var(--muted);font-weight:400;font-size:13px}
+.cprop{margin:8px 0 0;padding:0;list-style:none}
+.cprop li{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.cprop li b{min-width:92px;font-variant-numeric:tabular-nums}
+.cnote{background:var(--bg);border-radius:14px;padding:10px 14px;margin-top:8px;font-size:14px}
+.cnote .ans{margin-top:6px;color:var(--fg)}
+.cnote small{color:var(--muted)}
+.cmini .ctext{max-height:9.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
 </style>
 </head>
 <body>
@@ -473,7 +500,7 @@ var START=7, END=21, HPX=44;
 var DAYS=['Mo','Di','Mi','Do','Fr','Sa','So'];
 var KIND={lecture:'Vorlesung',practical:'Praktikum',study:'Lernblock'};
 var MTYPES=['Upload','Skript','Übung','Altklausur','Lösung','Praktikum','Projekt','Sonstiges'];
-var S={modules:{},blocks:{},study:{},logs:{},settings:{weeklyTarget:14,events:[]},loaded:false,tab:(store('lp_tab')||'today'),parea:'all',mod:null,
+var S={modules:{},blocks:{},study:{},logs:{},coach:{},checkins:{},notes:{},settings:{weeklyTarget:14,events:[]},loaded:false,tab:(store('lp_tab')||'today'),parea:'all',mod:null,
   week:null,day:0,db:null,assets:null,sample:null,downloads:null,form:{mod:'',min:'60',date:''},flip:{},timer:null,upMsg:'',
   chat:[],chatLog:[],busy:false,dragging:false,pendingRender:false};
 
@@ -501,8 +528,8 @@ function clone(x){return JSON.parse(JSON.stringify(x))}
 /* ---------- Daten ---------- */
 function sem(){return S.settings.semester||{lectStart:'2026-10-01',lectEnd:'2027-01-22',breaks:[['2026-12-24','2027-01-06']],examStart:'2027-01-23',examEnd:'2027-02-06'}}
 /* Bereiche: Studium ist der bisherige Lernplan, alles andere sind Projekte */
-var AREAS={studium:{n:'Studium',h:210},arbeit:{n:'Arbeit',h:30},gym:{n:'Gym & Sport',h:140},projekt:{n:'Projekte',h:265},hobby:{n:'Hobbys',h:330}};
-var AREA_ORDER=['gym','projekt','hobby','arbeit','studium'];
+var AREAS={studium:{n:'Studium',h:210},arbeit:{n:'Arbeit',h:30},gym:{n:'Gym & Sport',h:140},projekt:{n:'Projekte',h:265},hobby:{n:'Hobbys',h:330},sozial:{n:'Soziales & Neues',h:15}};
+var AREA_ORDER=['gym','projekt','hobby','sozial','arbeit','studium'];
 function areaOf(m){return m&&m.area&&AREAS[m.area]?m.area:'studium'}
 function isStudy(m){return areaOf(m)==='studium'}
 function studyMods(){return mods().filter(isStudy)}
@@ -554,13 +581,14 @@ function findMaterial(assetId){var r=null;mods().forEach(function(m){(m.material
 function render(){
   if(S.dragging||S.touching){S.pendingRender=true;return}
   renderOverall();renderTimerChip();
-  var tabs=[['today','Heute'],['week','Woche'],['modules','Studium'],['projects','Projekte'],['tracker','Stunden']];
+  var tabs=[['today','Heute'],['coach','Coach'],['week','Woche'],['modules','Studium'],['projects','Projekte'],['tracker','Stunden']];
   $('tabs').innerHTML=tabs.map(function(t){return '<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+ICO[t[0]]+'<span>'+t[1]+'</span></button>'}).join('');
   renderToast();
   var el=$('main');
   if(!S.loaded){el.innerHTML='<div class="skel"><i></i><i class="tall"></i><span>Lade Daten …</span></div>';return}
   var msg='';
   if(S.tab==='today')el.innerHTML=todayView();
+  else if(S.tab==='coach')el.innerHTML=coachView();
   else if(S.tab==='projects')el.innerHTML=projectList();
   else if(!mods().length)el.innerHTML='<div class="empty">Noch nichts gespeichert. Leg im Tab „Projekte“ etwas an oder schreib Claude, welche Module du belegst.</div>';
   else if(S.tab==='week')el.innerHTML=msg+weekView();
@@ -571,6 +599,7 @@ function render(){
 }
 /* Nur Darstellung: Symbole, Ringe, Hinweis unten */
 var ICO={
+  coach:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>',
   today:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>',
   projects:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
   week:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
@@ -821,10 +850,140 @@ function todayView(){
     :'<div class="empty">Leg dein erstes Projekt an, zum Beispiel Gym, ein Hobby oder ein eigenes Projekt.</div>';
   ps+='</div></div>';
   // Erinnerung an vernachlässigte Projekte
-  var nd='',cand=pl.map(function(m){var l=lastLog(m.id);return {m:m,days:l?-daysUntil(l):999}}).filter(function(c){return c.days>=3}).sort(function(a,b){return b.days-a.days})[0];
+  var nd='',cand=pl.filter(function(m){return !m.until||m.until>=today()}).map(function(m){var l=lastLog(m.id);return {m:m,days:l?-daysUntil(l):999}}).filter(function(c){return c.days>=3}).sort(function(a,b){return b.days-a.days})[0];
   if(cand)nd='<div class="nudge"><p>'+(cand.days>=999?'Für <b>'+esc(cand.m.name)+'</b> hast du noch nichts eingetragen.':'Seit '+cand.days+' Tagen nichts für <b>'+esc(cand.m.name)+'</b> gemacht.')+' Wie wäre es heute mit 30 Minuten?</p>'
     +(S.timer?'':'<button class="btn small" data-timer="start" data-mod="'+esc(cand.m.id)+'">Jetzt starten</button>')+'</div>';
-  return o+'<div class="grid2" style="margin-top:16px"><div class="stack">'+nd+tl+'</div><div class="stack">'+trainPanel()+ps+wg+'<button class="btn ghost small" data-acct="1" style="align-self:flex-start">Konto & Daten</button></div></div>';
+  return o+'<div class="grid2" style="margin-top:16px"><div class="stack">'+coachToday()+nd+tl+'</div><div class="stack">'+habitsPanel()+trainPanel()+ps+wg+'<button class="btn ghost small" data-acct="1" style="align-self:flex-start">Konto & Daten</button></div></div>';
+}
+
+
+/* ---------- Coach ----------
+   coach/{id}: {type:'morning'|'evening'|'week', date, title, text, proposal?:[{moduleId,date,start,end}], applied?}
+     wird von Claude zu festen Zeiten geschrieben. Morgens ab 6 Uhr sichtbar, abends und Wochenrückblick ab 20 Uhr, danach immer im Verlauf.
+   checkins/{date}: Abend-Check-in von Tobi. notes/{id}: Nachricht an den Coach, Claude antwortet mit answer. */
+var CK={morning:{n:'Morgenbriefing',at:360},evening:{n:'Abendreview',at:1200},week:{n:'Wochenrückblick',at:1200}};
+function nowMin(){var n=new Date();return n.getHours()*60+n.getMinutes()}
+function coachArr(){return Object.keys(S.coach||{}).map(function(id){var c=S.coach[id];c.id=id;return c})}
+function coachVisible(c){var t=today();if(!c.date||c.date<t)return true;if(c.date>t)return false;return nowMin()>=((CK[c.type]||CK.morning).at)}
+function coachOrder(a,b){var o={morning:0,evening:1,week:2};return a.date<b.date?1:a.date>b.date?-1:(o[a.type]||0)-(o[b.type]||0)}
+function mdLite(src){
+  var out=[],list=false;
+  String(src||'').split(/\n/).forEach(function(line){
+    var l=esc(line).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    var li=/^\s*[-•]\s+/.test(line);
+    if(li&&!list){out.push('<ul>');list=true}
+    if(!li&&list){out.push('</ul>');list=false}
+    if(li)out.push('<li>'+l.replace(/^\s*[-•]\s+/,'')+'</li>');
+    else if(/^#{1,4}\s/.test(line))out.push('<h4>'+l.replace(/^#{1,4}\s+/,'')+'</h4>');
+    else if(line.trim())out.push('<p>'+l+'</p>');
+  });
+  if(list)out.push('</ul>');
+  return '<div class="ctext">'+out.join('')+'</div>';
+}
+function dayLabel(d){return ['Mo','Di','Mi','Do','Fr','Sa','So'][wday(d)]+' '+fmtDate(d).slice(0,6)}
+function proposalHtml(c){
+  var pr=(c.proposal||[]).slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:hm(a.start)-hm(b.start)});
+  if(!pr.length)return '';
+  var past=pr[pr.length-1].date<today();
+  return '<h4 style="margin:14px 0 2px;font-size:15px">Vorschlag für die Woche</h4><ul class="cprop">'+pr.map(function(b){var m=modOf(b.moduleId);
+      return '<li><b>'+esc(dayLabel(b.date))+' '+esc(b.start)+'</b><span>'+esc(m.short||m.name)+(b.note?' · '+esc(b.note):'')+'</span></li>'}).join('')+'</ul>'
+    +(c.applied?'<p class="hint">Übernommen'+(c.appliedAt?' am '+fmtDate(c.appliedAt.slice(0,10)):'')+'. Du kannst jeden Block im Kalender weiter ändern.</p>'
+      :past?'':'<div class="frow" style="margin-top:10px"><button class="btn small" data-coach="apply|'+esc(c.id)+'">Plan übernehmen</button><span class="hint" style="margin:0">ersetzt deine noch offenen Blöcke in diesen Tagen</span></div>');
+}
+function entryHtml(c,full){
+  return '<div class="centry"><div class="ckind">'+esc((CK[c.type]||CK.morning).n)+' · '+esc(dayLabel(c.date))+'</div>'
+    +(c.title?'<h3 style="margin:4px 0 0">'+esc(c.title)+'</h3>':'')+mdLite(c.text)+(full&&c.type==='week'?proposalHtml(c):'')+'</div>';
+}
+function checkinHtml(ci){
+  if(!ci)return '';
+  var r=function(v){return v?v+'/5':'–'};
+  return '<div class="centry"><div class="ckind">Dein Check-in</div><div class="ctext"><p>Energie '+r(ci.energy)+' · Stimmung '+r(ci.mood)+(ci.sleep?' · Schlaf '+esc(ci.sleep)+' h':'')+'</p>'
+    +(ci.good?'<p><b>Lief gut:</b> '+esc(ci.good)+'</p>':'')+(ci.block?'<p><b>Hat aufgehalten:</b> '+esc(ci.block)+'</p>':'')
+    +((ci.top3||[]).filter(Boolean).length?'<p><b>Top 3 für morgen:</b> '+ci.top3.filter(Boolean).map(esc).join(' · ')+'</p>':'')+'</div></div>';
+}
+function weekSessions(m,mon){var r=weekRange(mon),d={};logsArr().forEach(function(l){if(l.moduleId===m.id&&l.date>=r[0]&&l.date<=r[1])d[l.date]=1});return Object.keys(d).length}
+function habitMods(){var t=today();return mods().filter(function(m){return +m.weeklyCount>0&&(!m.until||m.until>=t)})}
+function habitsPanel(){
+  var hm_=habitMods();if(!hm_.length)return '';
+  return '<div class="panel"><h3>Diese Woche</h3><div style="margin-top:6px">'+hm_.map(function(m){
+    var n=weekSessions(m),g=+m.weeklyCount,p=Math.min(100,Math.round(100*n/g));
+    var extra=m.until?' · noch '+Math.max(0,daysUntil(m.until))+' Tage':'';
+    return '<div class="goal" style="--h:'+(m.hue||210)+'"><div class="row"><b>'+esc(m.name)+'</b><span>'+n+' von '+g+(n>=g?' ✓':'')+extra+'</span></div><div class="bar"><i style="width:'+p+'%;background:hsl(var(--h) 60% 45%)"></i></div></div>'}).join('')
+    +'</div><p class="hint">Zählt Tage, an denen du einen Block abgehakt oder Zeit eingetragen hast.</p></div>';
+}
+function coachToday(){
+  var t=today(),vis=coachArr().filter(function(c){return c.date===t&&coachVisible(c)}).sort(coachOrder);
+  var ci=S.checkins[t],eve=nowMin()>=1200;
+  var o='<div class="panel cmini"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Coach</h3><button class="btn ghost small" data-tab="coach">Öffnen</button></div>';
+  if(vis.length)o+=entryHtml(vis[vis.length-1],false);
+  else o+='<div class="cwait">'+(nowMin()<360?'Dein Morgenbriefing kommt um 6 Uhr.':'Das Briefing für heute ist noch nicht da.')+'</div>';
+  if(eve&&!ci)o+='<div class="frow" style="margin-top:12px"><button class="btn small" data-coach="checkin">Abend-Check-in (2 Min.)</button></div>';
+  return o+'</div>';
+}
+function coachView(){
+  var t=today(),all=coachArr(),now=nowMin();
+  var cur=all.filter(function(c){return c.date===t&&coachVisible(c)}).sort(coachOrder);
+  var ci=S.checkins[t];
+  var o='<div class="grid2"><div class="stack"><div class="panel"><h3>Heute</h3>';
+  if(cur.length)o+=cur.map(function(c){return entryHtml(c,true)}).join('');
+  else o+='<div class="cwait">'+(now<360?'Dein Morgenbriefing kommt um 6 Uhr.':'Das Briefing für heute ist noch nicht da. Ich schreibe es jeden Morgen kurz vor 6 Uhr.')+'</div>';
+  if(!all.some(function(c){return c.date===t&&c.type==='evening'})&&now<1200)o+='<div class="cwait">Das Abendreview kommt um 20 Uhr.</div>';
+  o+='</div>';
+  // Abend-Check-in
+  o+='<div class="panel"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Abend-Check-in</h3>'
+    +(now>=1200||ci?'<button class="btn small" data-coach="checkin">'+(ci?'Ändern':'Ausfüllen')+'</button>':'')+'</div>'
+    +(ci?checkinHtml(ci):'<p class="hint">'+(now>=1200?'Zwei Minuten: Energie, Schlaf, was lief und deine Top 3 für morgen. Ich antworte darauf im Morgenbriefing.':'Ab 20 Uhr. Ich antworte darauf im Morgenbriefing.')+'</p>')+'</div>';
+  // Nachricht an den Coach
+  var ns=Object.keys(S.notes||{}).map(function(id){var n=S.notes[id];n.id=id;return n}).sort(function(a,b){return (b.at||'')<(a.at||'')?-1:1}).slice(0,5);
+  o+='<div class="panel"><div class="frow" style="justify-content:space-between;align-items:center"><h3>Nachricht an den Coach</h3><button class="btn small" data-coach="note">Schreiben</button></div>'
+    +'<p class="hint">Fragen, Wünsche oder Änderungen am Plan. Ich lese sie beim nächsten Briefing und antworte hier.</p>'
+    +ns.map(function(n){return '<div class="cnote"><small>'+esc(fmtDate((n.at||'').slice(0,10)))+'</small><div>'+esc(n.text)+'</div>'+(n.answer?'<div class="ans"><b>Coach:</b> '+esc(n.answer)+'</div>':'<small>wartet auf Antwort</small>')+'</div>'}).join('')+'</div>';
+  o+='</div><div class="stack">'+habitsPanel();
+  // Verlauf
+  var past=all.filter(function(c){return coachVisible(c)&&!(c.date===t)}),days={};
+  past.forEach(function(c){(days[c.date]=days[c.date]||[]).push(c)});
+  Object.keys(S.checkins||{}).forEach(function(d){if(d<t)days[d]=days[d]||[]});
+  var dl=Object.keys(days).sort().reverse();
+  o+='<div class="panel"><h3>Verlauf</h3>'+(dl.length?dl.map(function(d){var es=days[d].sort(coachOrder);
+      return '<details class="cday"><summary>'+esc(dayLabel(d))+'<span>'+es.map(function(c){return (CK[c.type]||CK.morning).n}).concat(S.checkins[d]?['Check-in']:[]).join(' · ')+'</span></summary>'
+        +es.map(function(c){return entryHtml(c,true)}).join('')+checkinHtml(S.checkins[d])+'</details>'}).join('')
+    :'<p class="hint">Hier sammeln sich alle Briefings, Reviews und Rückblicke.</p>')+'</div>';
+  return o+'</div></div>';
+}
+function rateRow(key,label,val){
+  return '<div class="field" style="margin-top:12px">'+label+'<div class="rate" data-key="'+key+'" data-val="'+(val||'')+'">'+[1,2,3,4,5].map(function(n){return '<button type="button" data-rate="'+key+'|'+n+'" aria-pressed="'+(+val===n)+'">'+n+'</button>'}).join('')+'</div></div>';
+}
+function coachAction(a,t){
+  var p=a.split('|');
+  if(p[0]==='checkin'){
+    var d=today(),ci=S.checkins[d]||{},tp=ci.top3||[];
+    openSheet('<h2>Abend-Check-in</h2><p class="hint" style="margin-top:0">'+esc(dayLabel(d))+'. Alles freiwillig, ein paar Worte reichen.</p>'
+      +rateRow('energy','Energie',ci.energy)+rateRow('mood','Stimmung',ci.mood)
+      +'<label class="field" style="margin-top:12px">Schlaf letzte Nacht (Stunden)<input type="text" inputmode="decimal" id="cisleep" value="'+esc(ci.sleep||'')+'"></label>'
+      +'<label class="field">Was lief heute gut?<textarea id="cigood">'+esc(ci.good||'')+'</textarea></label>'
+      +'<label class="field">Was hat dich aufgehalten?<textarea id="ciblock">'+esc(ci.block||'')+'</textarea></label>'
+      +'<label class="field">Top 3 für morgen<input type="text" id="cit0" value="'+esc(tp[0]||'')+'" placeholder="1."><input type="text" id="cit1" value="'+esc(tp[1]||'')+'" placeholder="2." style="margin-top:6px"><input type="text" id="cit2" value="'+esc(tp[2]||'')+'" placeholder="3." style="margin-top:6px"></label>'
+      +'<div class="frow" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-sheet="close">Abbrechen</button><button class="btn" data-coach="savecheckin|'+d+'">Speichern</button></div>');
+  }else if(p[0]==='savecheckin'){
+    var g=function(id){var e=$(id);return e?e.value.trim():''},rv=function(k){var e=document.querySelector('.rate[data-key="'+k+'"]');return e&&e.dataset.val?+e.dataset.val:null};
+    var doc={energy:rv('energy'),mood:rv('mood'),sleep:g('cisleep')?+g('cisleep').replace(',','.'):null,good:g('cigood'),block:g('ciblock'),top3:[g('cit0'),g('cit1'),g('cit2')],at:new Date().toISOString()};
+    S.db.doc('checkins/'+p[1]).set(doc).then(function(){toast('Check-in gespeichert. Gute Nacht!')}).catch(saveErr);closeSheet();
+  }else if(p[0]==='note'){
+    openSheet('<h2>Nachricht an den Coach</h2><label class="field">Was soll ich wissen oder ändern?<textarea id="cntext" style="min-height:110px"></textarea></label>'
+      +'<div class="frow" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-sheet="close">Abbrechen</button><button class="btn" data-coach="savenote">Senden</button></div>');
+  }else if(p[0]==='savenote'){
+    var tx=($('cntext')&&$('cntext').value.trim())||'';if(!tx){closeSheet();return}
+    S.db.collection('notes').doc('n-'+uid()).set({text:tx,at:new Date().toISOString()}).then(function(){toast('Gesendet. Ich antworte beim nächsten Briefing.')}).catch(saveErr);closeSheet();
+  }else if(p[0]==='apply'){
+    var c=S.coach[p[1]];if(!c||!c.proposal||!c.proposal.length)return;
+    if(t.dataset.confirm!=='1'){t.dataset.confirm='1';t.textContent='Wirklich übernehmen?';return}
+    var ds=c.proposal.map(function(b){return b.date}).sort(),from=ds[0],to=ds[ds.length-1];
+    var old=studyArr().filter(function(b){return b.date>=from&&b.date<=to&&!b.done&&b.date>=today()});
+    Promise.all(old.map(function(b){return S.db.doc('study/'+b.id).delete()}))
+      .then(function(){return Promise.all(c.proposal.filter(function(b){return b.date>=today()}).map(function(b,i){var o2={moduleId:b.moduleId,date:b.date,start:b.start,end:b.end,coach:c.id};return S.db.doc('study/cp-'+c.id+'-'+i).set(o2)}))})
+      .then(function(){return upd('coach/'+c.id,{applied:true,appliedAt:new Date().toISOString()})})
+      .then(function(){toast('Wochenplan übernommen.')}).catch(saveErr);
+  }
 }
 
 /* ---------- Projekte ---------- */
@@ -1065,7 +1224,7 @@ function sheetAction(a,btn){
    Finger: kurzes Tippen = Aktion, gedrückt halten (0,35 s) und ziehen = Lernblock verschieben, sonst scrollt die Seite.
    Aktionen bei Finger-Bedienung laufen direkt beim Loslassen, nicht über das click-Ereignis, weil iOS das click
    in eingebetteten Seiten oft verschluckt. Während ein Finger liegt, wird die Seite nicht neu gezeichnet. */
-var ACT='[data-acct],[data-trdir],[data-trrefresh],[data-trset],[data-tblk],[data-quickdone],[data-newproj],[data-parea],[data-archive],[data-tab],[data-day],[data-wk],[data-open],[data-closemod],[data-askmod],[data-ask],[data-deltopic],[data-flip],[data-card],[data-timer],[data-dellog],[data-delmat],[data-deltool],[data-asset],[data-closeviewer],[data-newblock],[data-ics],[data-sheet],[data-chat],[data-sug],.col';
+var ACT='[data-coach],[data-rate],[data-acct],[data-trdir],[data-trrefresh],[data-trset],[data-tblk],[data-quickdone],[data-newproj],[data-parea],[data-archive],[data-tab],[data-day],[data-wk],[data-open],[data-closemod],[data-askmod],[data-ask],[data-deltopic],[data-flip],[data-card],[data-timer],[data-dellog],[data-delmat],[data-deltool],[data-asset],[data-closeviewer],[data-newblock],[data-ics],[data-sheet],[data-chat],[data-sug],.col';
 var drag=null,tap=null,lastTap=0,touchHold=null,swipe=null;
 /* Wischen im Wochenplan: Handy einen Tag weiter/zurück (über Wochengrenzen), sonst eine Woche */
 function doSwipe(dir){
@@ -1407,6 +1566,8 @@ function act(t,target,e){
   else if(d.newblock){openNewBlock(d.newblock==='today'?today():undefined)}
   else if(d.ics){openIcs()}
   else if(d.acct){window.PLAN&&PLAN.account()}
+  else if(d.rate){var rp=d.rate.split('|');t.parentNode.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b===t)});t.parentNode.dataset.val=rp[1]}
+  else if(d.coach){coachAction(d.coach,t)}
   else if(d.sheet){if(d.sheet==='ics')doIcs();else sheetAction(d.sheet,t)}
   else if(d.chat){if(d.chat==='close')$('chat').hidden=true;else if(d.chat==='new'){S.chat=[];S.chatLog=[];renderChat(true)}else if(d.chat==='stop'&&S.ctl)S.ctl.abort()}
   else if(d.sug){$('chatbox').value=d.sug;sendChat()}
@@ -1465,8 +1626,8 @@ function sub(name,cb){
 }
 function init(db){
   S.db=db;var need={modules:1,blocks:1,study:1,logs:1,settings:1};
-  function done(k){delete need[k];if(!Object.keys(need).length){S.loaded=true;if(!/^(today|week|modules|projects|tracker)$/.test(S.tab))S.tab='today';if(!S.form.mod&&mods()[0])S.form.mod=mods()[0].id}}
-  sub('modules',function(){done('modules')});sub('blocks',function(){done('blocks')});sub('study',function(){done('study')});sub('logs',function(){done('logs')});
+  function done(k){delete need[k];if(!Object.keys(need).length){S.loaded=true;if(!/^(today|coach|week|modules|projects|tracker)$/.test(S.tab))S.tab='today';if(!S.form.mod&&mods()[0])S.form.mod=mods()[0].id}}
+  sub('modules',function(){done('modules')});sub('blocks',function(){done('blocks')});sub('study',function(){done('study')});sub('logs',function(){done('logs')});sub('coach');sub('checkins');sub('notes');
   db.doc('settings/main').onSnapshot(function(s){if(s.exists)S.settings=Object.assign({weeklyTarget:14,events:[]},clone(s.data()));done('settings');render()},function(){done('settings');render()});
 }
 if(window.claude&&claude.use){
